@@ -109,3 +109,114 @@
 </body>
 
 </html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body>
+    <div class="container" id="container_app">
+        <div class="overlay">
+            <form action="#" @submit.prevent="login">
+                <div class="con">
+                    <header class="head-form">
+                        <h2>LOGIN</h2>
+                        <p>login here using your username and password</p>
+                    </header>
+                    <br>
+                    <div class="field-set">
+                        <span class="input-item">
+                            <i class="fa fa-user-circle"></i>
+                        </span>
+                        <input class="form-input" type="text" placeholder="UserName" v-model="username" required>
+                        <br>
+                        <span class="input-item">
+                            <i class="fa fa-key"></i>
+                        </span>
+                        <input class="form-input" type="password" placeholder="Password" v-model="password" id="pwd"
+                            required>
+                        <span>
+                            <i class="fa fa-eye" aria-hidden="true" type="button" id="eye"></i>
+                        </span>
+                        <br>
+                        <button class="log-in" type="submit">LOGIN</button>
+                    </div>
+                </div>
+                <div class="error-message" v-if="error">{{ errorMessage }}</div>
+            </form>
+
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script type="text/javascript">
+        const { createApp, ref } = Vue
+
+        createApp({
+            setup() {
+                const username = ref('');
+                const password = ref('');
+                const error = ref(false);
+                const errorMessage = ref('Los datos ingresados son incorrectos.');
+
+                const login = () => {
+                    var myHeaders = new Headers();
+                    myHeaders.append("Content-Type", "application/json");
+                    myHeaders.append(
+                        "Authorization",
+                        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI0YzQ4YTdlMjcyOWMwNWEwMzczZTg5NDY1YjI1ZTZkMiIsInN1YiI6IjY1MTdkNmQ3OWQ1OTJjMDEwMmJmNjdiYyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.hovvKtRrlrxuPwNCdSoFiHvvaRAWtXSTMDMj0XXutxo"
+                    );
+
+                    var raw = JSON.stringify({
+                        "username": username.value,
+                        "password": password.value,
+                        "request_token": ""
+                    });
+
+                    var requestOptions = {
+                        method: "POST",
+                        headers: myHeaders,
+                        body: raw,
+                        redirect: "follow"
+                    };
+
+                    fetch("https://api.themoviedb.org/3/authentication/token/validate_with_login", requestOptions)
+                        .then((response) => response.json())
+                        .then((result) => {
+                            console.log(result);
+                            console.log(result.success);
+
+                            if (result.success) {
+                                localStorage.setItem('userLoggedIn', 'true');
+                                error.value = false;
+
+                                window.location.href = '../home/home.html';
+
+                            } else {
+                                error.value = true;
+                            }
+                        })
+                        .catch((error) => console.log("error", error));
+                };
+
+                return {
+                    username,
+                    password,
+                    error,
+                    errorMessage,
+                    login,
+                };
+            },
+
+        }).mount("#container_app");
+    </script>
+    <script src="script.js"></script>
+</body>
+
+</html>
